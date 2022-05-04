@@ -1,6 +1,14 @@
+//
+// Created by mohamed on 30/04/22.
+//
+
+#ifndef OS_PROJECT_MAIN_QUEUE_H
+#define OS_PROJECT_MAIN_QUEUE_H
+
+
 #include <stdio.h>
 #include <stdlib.h>
-#include "dataStructures/commons.h"
+#include "dataStructures/Commons.h"
 
 struct queue
 {
@@ -10,29 +18,29 @@ struct queue
     int rear;       // rear points to the last element in the queue
     int size;       // current capacity of the queue
 };
- 
+
 struct queue* newQueue(int size)
 {
     struct queue *pt = NULL;
     pt = (struct queue*)malloc(sizeof(struct queue));
- 
+
     pt->items = (struct processBlock*)malloc(size * sizeof(struct processBlock));
     pt->maxsize = size;
     pt->front = 0;
     pt->rear = -1;
     pt->size = 0;
- 
+
     return pt;
 }
- 
+
 int size(struct queue *pt) {
     return pt->size;
 }
- 
+
 int isEmpty(struct queue *pt) {
     return !size(pt);
 }
- 
+
 struct processBlock * front(struct queue *pt)
 {
     if (isEmpty(pt))
@@ -40,10 +48,10 @@ struct processBlock * front(struct queue *pt)
         printf("Underflow\nProgram Terminated\n");
         exit(EXIT_FAILURE);
     }
- 
+
     return &pt->items[pt->front];
 }
- 
+
 void enqueue(struct queue *pt, struct processBlock* x)
 {
     if (size(pt) == pt->maxsize)
@@ -51,14 +59,14 @@ void enqueue(struct queue *pt, struct processBlock* x)
         printf("Overflow\nProgram Terminated\n");
         exit(EXIT_FAILURE);
     }
- 
+
     pt->rear = (pt->rear + 1) % pt->maxsize;    // circular queue
     pt->items[pt->rear] = *x;
     pt->size++;
- 
+
     printf("front = %d, rear = %d\n", pt->front, pt->rear);
 }
- 
+
 void dequeue(struct queue *pt)
 {
     if (isEmpty(pt))    // front == rear
@@ -66,9 +74,10 @@ void dequeue(struct queue *pt)
         printf("Underflow\nProgram Terminated\n");
         exit(EXIT_FAILURE);
     }
- 
+
     pt->front = (pt->front + 1) % pt->maxsize;  // circular queue
     pt->size--;
- 
+
     printf("front = %d, rear = %d\n", pt->front, pt->rear);
 }
+#endif //OS_PROJECT_MAIN_QUEUE_H

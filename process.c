@@ -6,19 +6,15 @@ int remainingtime;
 int main(int agrc, char * argv[])
 {
     initClk();
-    remainingtime = atoi(argv[0]);
-    int lastClk = getClk();
-    int currentClk = lastClk;
+    
+    //TODO it needs to get the remaining time from somewhere
+    //remainingtime = ??;
     while (remainingtime > 0)
     {
-        currentClk = getClk();
-        if(currentClk != lastClk){
-            remainingtime -= (currentClk - lastClk);
-            printf("remaining %d\n", remainingtime);
-        }
-        lastClk = currentClk;
+        // remainingtime = ??;
     }
+    
     destroyClk(false);
-
+    
     return 0;
 }

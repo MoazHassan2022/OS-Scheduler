@@ -14,14 +14,19 @@ void waitTillProcessFinishes(int remainingtime){
         lastClk = currentClk;
     }
 }
-int runRoundRobin(struct queue * currentQueue, int quantum){ // returns time spent
+int runRoundRobin(struct queue * currentQueue, int quantum){ // returns if process terminated or not
+    /*
+     * if process terminated ---> will return 1
+     * if process didn't terminated   -->  will return 0
+    */
     if(isEmpty(currentQueue))
         return 0;
     struct processBlock* pr = front(currentQueue);
     int remainingTime;
     if(pr->remainingTime <= 0){
         dequeue(currentQueue); // finished
-        return 0;
+        //this case is theoritcally impossible but actually we will have to dequeue this process from queue so will return 1
+        return 1;
     }
     if(pr->remainingTime <= quantum)
         remainingTime = pr->remainingTime;
@@ -40,14 +45,21 @@ int runRoundRobin(struct queue * currentQueue, int quantum){ // returns time spe
         dequeue(currentQueue);
         waitTillProcessFinishes(remainingTime);
         pr->remainingTime -= remainingTime;
-        if(pr->remainingTime > 0)
+        if(pr->remainingTime > 0) {
             enqueue(currentQueue, pr);
+            return 0;
+        }
         else
-            printf("Process %d finishes...", pr->id);
+        {
+            //printf("Process %d finishes...", pr->id);
+            return 1;
+        }
     }
 }
 
-
+/*
+ *
+ * this for test
 int main(int agrc, char * argv[])
 {
     initClk();
@@ -76,3 +88,4 @@ int main(int agrc, char * argv[])
 
     return 0;
 }
+*/
