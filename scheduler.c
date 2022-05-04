@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
         {
             //we are in the parent process
             while (1) {
-                struct process p;
+                struct processBlock p;
                 int rec = msgrcv(Queue, &p, /*4 + 4 + 4 + 4 + 8*/ 100, 0, IPC_NOWAIT);
                 if (rec != -1) {
 
