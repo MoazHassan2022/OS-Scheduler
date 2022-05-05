@@ -1,6 +1,7 @@
 #include "priority_queue.h"
 #include "queue.h"
 #include "roundRobinTest.c"
+#include "HPF.h"
 //this include contains the headers file
 
 
@@ -48,8 +49,11 @@ int main(int argc, char *argv[])
    * will define the queues that will filled by the schedular
    */
 
-   struct priorityQueue processTableForHPF;
-   struct priorityQueue processTableForSRTN;
+   if(algorithm != 3) {
+       initPriorityQueue(numberOfProcesses);
+       (algorithm==1)?setSorting(1): setSorting(0);
+   }
+
    struct queue processTableForRR;
 
 
@@ -70,9 +74,10 @@ int main(int argc, char *argv[])
             switch (algorithm) {
                 case 1:
                     //HPF
+                    HPF(extractMax());  //extract will get the last element and remove from the queue
                     break;
                 case 2:
-                    // SRTN
+                    //SRTN
                     break;
                 case 3:
                     //RR
@@ -87,7 +92,7 @@ int main(int argc, char *argv[])
         {
             //we are in the parent process
             while (1) {
-                struct processBlock p;
+                struct processEntry p;
                 int rec = msgrcv(Queue, &p, /*4 + 4 + 4 + 4 + 8*/ 100, 0, IPC_NOWAIT);
                 if (rec != -1) {
 
@@ -95,13 +100,13 @@ int main(int argc, char *argv[])
                     // add the recevied process to the queue
                     switch (algorithm) {
                         case 1:
-                            push(p, -p.Prty, &processTableForHPF);
+                            insert(p);
                             break;
                         case 2:
-                            push(p, -p.Prty, &processTableForSRTN);
+                            insert(p);
                             break;
                         case 3:
-                            enqueue(&processTableForRR, /*should pass process block bas ana msh 3aref :_( */p);
+                            enqueue(&processTableForRR, p);
                             break;
                         default:
                             break;
@@ -114,6 +119,10 @@ int main(int argc, char *argv[])
                 }
                 //check if the child process exited
                 int *chldstate;
+                //Return value of waitpid()
+                //
+                //    pid of child, if child has exited
+                //    0, if using WNOHANG and child hasn’t exited.
                 int stateOfChld = waitpid(pid, chldstate, WNOHANG);
                 if (stateOfChld > 0)
                 {

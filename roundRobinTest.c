@@ -2,18 +2,7 @@
 #include "queue.h" // queue and commons
 
 /* Modify this file as needed*/
-void waitTillProcessFinishes(int remainingtime){
-    int lastClk = getClk();
-    int currentClk = lastClk;
-    while (remainingtime > 0)
-    {
-        currentClk = getClk();
-        if(currentClk != lastClk){
-            remainingtime -= (currentClk - lastClk);
-        }
-        lastClk = currentClk;
-    }
-}
+
 int runRoundRobin(struct queue * currentQueue, int quantum){ // returns if process terminated or not
     /*
      * if process terminated ---> will return 1
@@ -21,7 +10,7 @@ int runRoundRobin(struct queue * currentQueue, int quantum){ // returns if proce
     */
     if(isEmpty(currentQueue))
         return 0;
-    struct processBlock* pr = front(currentQueue);
+    struct processEntry* pr = front(currentQueue);
     int remainingTime;
     if(pr->remainingTime <= 0){
         dequeue(currentQueue); // finished
@@ -43,7 +32,8 @@ int runRoundRobin(struct queue * currentQueue, int quantum){ // returns if proce
     }
     else{
         dequeue(currentQueue);
-        waitTillProcessFinishes(remainingTime);
+        int stat;
+        wait(&stat);
         pr->remainingTime -= remainingTime;
         if(pr->remainingTime > 0) {
             enqueue(currentQueue, pr);
@@ -63,9 +53,9 @@ int runRoundRobin(struct queue * currentQueue, int quantum){ // returns if proce
 int main(int agrc, char * argv[])
 {
     initClk();
-    struct processBlock* pr[4];
+    struct processEntry* pr[4];
     for(int i = 0; i<4; i++){
-        pr[i] = malloc(sizeof(struct processBlock));
+        pr[i] = malloc(sizeof(struct processEntry));
         pr[i]->remainingTime = (i + 1) * 2;
         pr[i]->id = i+1;
     }

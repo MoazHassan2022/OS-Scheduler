@@ -12,7 +12,7 @@
 
 struct queue
 {
-    struct processBlock *items;     // array to store queue elements
+    struct processEntry *items;     // array to store queue elements
     int maxsize;    // maximum capacity of the queue
     int front;      // front points to the front element in the queue (if any)
     int rear;       // rear points to the last element in the queue
@@ -24,7 +24,7 @@ struct queue* newQueue(int size)
     struct queue *pt = NULL;
     pt = (struct queue*)malloc(sizeof(struct queue));
 
-    pt->items = (struct processBlock*)malloc(size * sizeof(struct processBlock));
+    pt->items = (struct processEntry*)malloc(size * sizeof(struct processEntry));
     pt->maxsize = size;
     pt->front = 0;
     pt->rear = -1;
@@ -41,7 +41,7 @@ int isEmpty(struct queue *pt) {
     return !size(pt);
 }
 
-struct processBlock * front(struct queue *pt)
+struct processEntry * front(struct queue *pt)
 {
     if (isEmpty(pt))
     {
@@ -52,7 +52,7 @@ struct processBlock * front(struct queue *pt)
     return &pt->items[pt->front];
 }
 
-void enqueue(struct queue *pt, struct processBlock* x)
+void enqueue(struct queue *pt, struct processEntry* x)
 {
     if (size(pt) == pt->maxsize)
     {
