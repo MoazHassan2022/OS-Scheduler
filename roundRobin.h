@@ -1,7 +1,9 @@
 #include "headers.h"
-#include "queue.h" // queue and commons
+
 
 /* Modify this file as needed*/
+
+
 
 int runRoundRobin(struct queue * currentQueue, int quantum){ // returns if process terminated or not
     /*
@@ -32,8 +34,7 @@ int runRoundRobin(struct queue * currentQueue, int quantum){ // returns if proce
     }
     else{
         dequeue(currentQueue);
-        int stat;
-        wait(&stat);
+        waitTillProcessFinishes(pr->remainingTime);
         pr->remainingTime -= remainingTime;
         if(pr->remainingTime > 0) {
             enqueue(currentQueue, pr);

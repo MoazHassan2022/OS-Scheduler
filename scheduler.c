@@ -1,17 +1,14 @@
-#include "priority_queue.h"
-#include "queue.h"
-#include "roundRobinTest.c"
-#include "HPF.h"
+#include "algorithms.h"
 //this include contains the headers file
 
 
 int main(int argc, char *argv[])
 {
+    sleep(2);
     int algorithm = 0;
     int Q = 0;
     int numberOfProcesses = 0;
     // initiating the Clk
-    sleep(2); // to make sure that the clock has been initiated in the proccess generator
     initClk();
     printf("Hello From Scheduler\n");
 
@@ -20,8 +17,7 @@ int main(int argc, char *argv[])
 
     algorithm = atoi(argv[0]);
     Q = atoi(argv[1]);
-   
-    
+
 
     // creating connection between it and the process_generator
     key_t key = ftok("keyFile", 'c');
@@ -56,12 +52,6 @@ int main(int argc, char *argv[])
 
    struct queue processTableForRR;
 
-
-
-
-
-  
-
     // else do the work
     while (1)
     {
@@ -73,30 +63,27 @@ int main(int argc, char *argv[])
             //we are in the process assigned for algorithm
             switch (algorithm) {
                 case 1:
-                    //HPF
-                    HPF(extractMax());  //extract will get the last element and remove from the queue
+                    HPF();  //extract will get the last element and remove from the queue
                     break;
                 case 2:
-                    //SRTN
+                    exit(SRTN());
                     break;
                 case 3:
-                    //RR
                     exit(runRoundRobin(&processTableForRR,Q));
                     break;
                 default:
                     break;
             }
-            exit(1);
+            exit(1);   //general case for HPF
         }
         else
         {
             //we are in the parent process
             while (1) {
                 struct processEntry p;
-                int rec = msgrcv(Queue, &p, /*4 + 4 + 4 + 4 + 8*/ 100, 0, IPC_NOWAIT);
+                int rec = msgrcv(Queue, &p, /*4 + 4 + 4 + 4 + 8*/ sizeof(struct processEntry), 0, IPC_NOWAIT);
                 if (rec != -1) {
-
-                    printf("recevied process id %d , process art %d \n", p.id, p.arvT);
+                    printf("recevied process id %d , process art %d \n", p.id, p.arrivalTime);
                     // add the recevied process to the queue
                     switch (algorithm) {
                         case 1:
@@ -106,31 +93,29 @@ int main(int argc, char *argv[])
                             insert(p);
                             break;
                         case 3:
-                            enqueue(&processTableForRR, p);
+                            enqueue(&processTableForRR, &p);
                             break;
                         default:
                             break;
                     }
                     // [nabil] : why sleep
-                    sleep(1);
-                } else {
-                    // do something
-                    // [nabil] : if not receive something I will not do any thing
+                    //sleep(1);
                 }
                 //check if the child process exited
                 int *chldstate;
                 //Return value of waitpid()
-                //
                 //    pid of child, if child has exited
                 //    0, if using WNOHANG and child hasn’t exited.
                 int stateOfChld = waitpid(pid, chldstate, WNOHANG);
                 if (stateOfChld > 0)
                 {
-                    if(WEXITSTATUS(chldstate))
+                    if(WEXITSTATUS(*chldstate))
                         switch (algorithm) {
                         case 1 :
+                            extractMax();
                             break;
                         case 2:
+                            extractMax();
                             break;
                         case 3:
                             dequeue(&processTableForRR);

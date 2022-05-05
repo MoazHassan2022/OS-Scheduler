@@ -1,21 +1,15 @@
-#include<stdio.h> // define the header file
-
-struct processEntry {
-    int id;
-    int arrivalTime;
-    int runningTime;
-    int priority;
-    int remainingTime;
-    int criteria;
-    int PID;
-    int runningID; //order of running
-};
+#include "Commons.h"
 
 
-struct processEntry H[];
+struct processEntry *H;
 int size = -1;
 short sorting = 1;
 
+
+bool isPriorityQueueEmpty()
+{
+    return (size < 0);  //0 -> 1 element
+}
 
 void setSorting(short sortingVal){
     sorting = sortingVal;
@@ -115,7 +109,12 @@ void insert(struct processEntry p)
 
 struct processEntry extractMax()
 {
-    struct processEntry result = H[0];
+    struct processEntry result ;
+
+    if(isPriorityQueueEmpty())
+        return result;
+
+    result = H[0];
 
     H[0] = H[size];
     size = size - 1;
@@ -129,6 +128,8 @@ struct processEntry getMax()
     return H[0];
 }
 
+
+/*
 int main()
 {
     struct processEntry p[3];
@@ -158,3 +159,4 @@ int main()
 
     return 0;
 }
+ */

@@ -2,39 +2,32 @@
 // Created by mohamed on 30/04/22.
 //
 
-#ifndef OS_PROJECT_MAIN_QUEUE_H
-#define OS_PROJECT_MAIN_QUEUE_H
 
-
-#include <stdio.h>
-#include <stdlib.h>
-#include "dataStructures/Commons.h"
 
 struct queue
 {
     struct processEntry *items;     // array to store queue elements
-    int maxsize;    // maximum capacity of the queue
+    int maxqueueSize;    // maximum capacity of the queue
     int front;      // front points to the front element in the queue (if any)
     int rear;       // rear points to the last element in the queue
-    int size;       // current capacity of the queue
+    int queueSize;       // current capacity of the queue
 };
 
-struct queue* newQueue(int size)
+struct queue* newQueue(int qs)
 {
-    struct queue *pt = NULL;
-    pt = (struct queue*)malloc(sizeof(struct queue));
+    struct queue *pt = (struct queue*)malloc(sizeof(struct queue));
 
-    pt->items = (struct processEntry*)malloc(size * sizeof(struct processEntry));
-    pt->maxsize = size;
+    pt->items = (struct processEntry*)malloc( qs * sizeof(struct processEntry));
+    pt->maxqueueSize = qs;
     pt->front = 0;
     pt->rear = -1;
-    pt->size = 0;
+    pt->queueSize = 0;
 
     return pt;
 }
 
 int size(struct queue *pt) {
-    return pt->size;
+    return pt->queueSize;
 }
 
 int isEmpty(struct queue *pt) {
@@ -54,15 +47,15 @@ struct processEntry * front(struct queue *pt)
 
 void enqueue(struct queue *pt, struct processEntry* x)
 {
-    if (size(pt) == pt->maxsize)
+    if (size(pt) == pt->maxqueueSize)
     {
         printf("Overflow\nProgram Terminated\n");
         exit(EXIT_FAILURE);
     }
 
-    pt->rear = (pt->rear + 1) % pt->maxsize;    // circular queue
+    pt->rear = (pt->rear + 1) % pt->maxqueueSize;    // circular queue
     pt->items[pt->rear] = *x;
-    pt->size++;
+    pt->queueSize++;
 
     printf("front = %d, rear = %d\n", pt->front, pt->rear);
 }
@@ -75,9 +68,8 @@ void dequeue(struct queue *pt)
         exit(EXIT_FAILURE);
     }
 
-    pt->front = (pt->front + 1) % pt->maxsize;  // circular queue
-    pt->size--;
+    pt->front = (pt->front + 1) % pt->maxqueueSize;  // circular queue
+    pt->queueSize--;
 
     printf("front = %d, rear = %d\n", pt->front, pt->rear);
 }
-#endif //OS_PROJECT_MAIN_QUEUE_H

@@ -1,3 +1,4 @@
+#include <stdbool.h>
 /*Struct process data for all processes loaded from input file and processes in ready queue*/
 struct processEntry {
     int id;
@@ -8,6 +9,7 @@ struct processEntry {
     int criteria;
     int PID;
     int runningID; //order of running
+    long header;
 } processEntry;
 
 
@@ -29,11 +31,4 @@ struct processMsgBuff
 {
    long mtype;
    struct processEntry mProcess;
-};
-
-/*Enum for Algorithms' choice*/
-enum Algorithm {
-        HPF,
-        SRTN,
-        RoundRobin
 };
