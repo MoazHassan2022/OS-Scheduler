@@ -17,36 +17,52 @@ int main(int argc, char * argv[])
     else
         printf("Queue id is %d\n" , Queue);
 
-    // 1. Read the input files.
-    FILE * myFile = fopen ("processes.txt" , "r") ;
-    if(myFile == NULL) // can't open the file
-    {
-        perror("Unable to open the file\n");
-        exit(-1);
-    }
+    //1. Reading the file
+    FILE* file ;
+    char line[100] ;
+    file = fopen("processes.txt", "a+");
 
-    //determining the number of lines in the file
-    int processesCounter = 0 ;
-    char line [30] ;
-    while(fgets(line , sizeof(line), myFile))
+    if(file == NULL)
+        printf("Can't Open The File\n");
+
+    long processesCounter = 0 ;
+    while (fgets(line, sizeof(line) , file))
     {
-        if(line[0] == '#') // neglect comments
+        if(line[0] == '#')
             continue;
-        processesCounter ++;
+        processesCounter ++ ;
     }
 
-    //vector of proccesses
+    printf("process Counter = %li \n" , processesCounter);
+
+    fclose(file);
+    file = fopen("processes.txt", "a+");
+
     struct processEntry*ptable  = malloc(processesCounter * 40) ;  // ana hena ghalebn h2ra el file mrten 34an a3rf el size
-    while(fgets(line , sizeof(line), myFile))
+    processesCounter = 0 ;
+    char c[100] ;
+    while (fscanf(file , "%s" ,  c) == 1)
     {
-        if(line[0] == '#') // neglect comments
-            continue;
-        struct processEntry* p = malloc(40 /*da el size bta3 el bytes elly procces block btst5dmo*/);  // create new proccess
-        p->header = 1 ; // setting the header always equal to 1
-        fscanf(myFile, "%d %d %d %d" , &p->id , &p->arrivalTime, &p->runningTime, &p->priority); // read it from the file
-        ptable[processesCounter++] = *p  ;
+        if(c[0] == '#')
+        {
+            char ignore[1024];
+            fgets(ignore, sizeof(ignore), file);
+        }
+        else
+        {
+            struct processEntry* p = malloc(40);  // create new proccess
+            p->header = 1 ; // setting the header always equal to 1
+            sscanf(c , "%d" , &p->id);
+            if(p->id == 0)
+                p->id = 1;
+            fscanf(file, "%d %d %d",&p->arrivalTime, &p->runningTime, &p->priority); // read it from the file
+            p->remainingTime = p->runningTime ;
+            ptable[processesCounter] = *p  ;
+            processesCounter++ ;
+        }
     }
 
+    fclose(file);
     // 2. Ask the user for the chosen scheduling algorithm and its parameters, if there are any.
     int schdulAlgoNo = 0 ;
     int Q = 0; // Quantum
@@ -70,14 +86,17 @@ int main(int argc, char * argv[])
         {
             // argv -> should contain the type of algo,
             // if RR -> send Quantum
-            char s1[10] ;
-            char s2[10] ;
+            char s1[5] ;
+            char s2[5] ;
+            char *s3 = malloc(1 * processesCounter) ;
+            sprintf(s3 , "%ld" , processesCounter) ;
             sprintf(s1 , "%d" , schdulAlgoNo);  // converting the int to string
             sprintf(s2 , "%d" , Q);
             //sending these data as arguments to the schedular
-            char * data[] = {s1, s2} ;
+            char * data[] = {s1, s2 , s3} ;
             char * envp [] = {"some" , "enviroment" , NULL} ;
             printf("iam executing execv of pid2\n") ;
+            //free(s3);
             if(execve("./scheduler.out", data, envp) == -1 )
                 perror("Couldent execve");
         }
@@ -98,19 +117,23 @@ int main(int argc, char * argv[])
         printf("current time is %d\n", x);
         if(x >= ptable[counter].arrivalTime) // if it is the time for it to be sent then send it to the schedular
         {
-            struct processEntry p = ptable[counter++];
-            int send = msgsnd(Queue , &p , sizeof(struct processEntry) , !IPC_NOWAIT );
+
+            struct processEntry p = ptable[counter];
+            counter++;
+            int send = msgsnd(Queue , &p ,sizeof(p), !IPC_NOWAIT && MSG_NOERROR);
             if(send == -1)
             {
                 perror("fail to send\n") ;
-                exit(-1);
+                //exit(-1);
             }
         }
+
         sleep(1);   // sleep the second of the clock
     }
     // 7. Clear clock resources
-    destroyClk(true);
+    //destroyClk(true);
     free (ptable) ;
+    raise(SIGINT);
 }
 
 void clearResources(int signum)

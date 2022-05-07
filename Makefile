@@ -8,7 +8,9 @@ build:
 clean:
 	rm -f *.out  processes.txt
 
-all: clean build
-
 run:
 	./process_generator.out
+
+
+all: clean build run
+

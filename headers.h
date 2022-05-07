@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <string.h>
+#include <limits.h>
 #include "priority_queue.h"
 
 
@@ -124,12 +125,6 @@ int isEmpty(struct queue *pt) {
 
 struct processEntry * front(struct queue *pt)
 {
-    if (isEmpty(pt))
-    {
-        printf("Underflow\nProgram Terminated\n");
-        exit(EXIT_FAILURE);
-    }
-
     return &pt->items[pt->front];
 }
 

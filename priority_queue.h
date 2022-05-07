@@ -1,23 +1,31 @@
 #include "Commons.h"
 
+struct priorityQueue {
+    struct processEntry *H;
+    int mySize ;
+    short sorting ;
+};
 
-struct processEntry *H;
-int size = -1;
-short sorting = 1;
 
-
-bool isPriorityQueueEmpty()
+bool isPriorityQueueEmpty(struct priorityQueue* q)
 {
-    return (size < 0);  //0 -> 1 element
+    return (q->mySize < 0);  //0 -> 1 element
 }
 
-void setSorting(short sortingVal){
-    sorting = sortingVal;
+void setSorting(short sortingVal,struct priorityQueue* q){
+    q->sorting = sortingVal;
 }
 
-void initPriorityQueue(int sizeOfQueue)
+void initPriorityQueue(int sizeOfQueue,struct priorityQueue* q)
 {
-    H= (struct processEntry*)malloc(sizeOfQueue * sizeof(struct processEntry));
+    q->H= (struct processEntry*)malloc(sizeOfQueue * sizeof(struct processEntry));
+    for(int i = 0 ; i < sizeOfQueue ; i++ )
+    {
+        q->H[i].priority = 100000000;
+        q->H[i].id=500;
+    }
+    q->mySize=-1;
+    q->sorting=1;
 }
 
 int parent(int i)
@@ -42,90 +50,90 @@ void pswap(struct processEntry *A, struct processEntry *B){
 }
 
 
-void shiftUp(int i)
+void shiftUp(int i,struct priorityQueue* q)
 {
-    if(sorting == 0){
-        while (i > 0 && H[parent(i)].remainingTime > H[i].remainingTime) {
-            pswap(&H[parent(i)], &H[i]);
+    if(q->sorting == 0){
+        while (i > 0 && q->H[parent(i)].remainingTime > q->H[i].remainingTime) {
+            pswap(&q->H[parent(i)], &q->H[i]);
 
             i = parent(i);
         }
     }
     else{
-        while (i > 0 && H[parent(i)].priority > H[i].priority) {
-            pswap(&H[parent(i)], &H[i]);
+        while (i > 0 && q->H[parent(i)].priority > q->H[i].priority) {
+            pswap(&q->H[parent(i)], &q->H[i]);
 
             i = parent(i);
         }
     }
 }
 
-void shiftDown(int i)
+void shiftDown(int i,struct priorityQueue* q)
 {
     int maxIndex = i;
 
     int l = leftChild(i);
-    if(sorting == 0){
-        if (l <= size && H[l].remainingTime < H[maxIndex].remainingTime) {
+    if(q->sorting == 0){
+        if (l <= q->mySize && q->H[l].remainingTime < q->H[maxIndex].remainingTime) {
             maxIndex = l;
         }
 
         int r = rightChild(i);
 
-        if (r <= size && H[r].remainingTime < H[maxIndex].remainingTime) {
+        if (r <= q->mySize && q->H[r].remainingTime < q->H[maxIndex].remainingTime) {
             maxIndex = r;
         }
 
         if (i != maxIndex) {
-            pswap(&H[i], &H[maxIndex]);
-            shiftDown(maxIndex);
+            pswap(&q->H[i], &q->H[maxIndex]);
+            shiftDown(maxIndex,q);
         }
     }
     else{
-        if (l <= size && H[l].priority < H[maxIndex].priority) {
+        if (l <= q->mySize && q->H[l].priority < q->H[maxIndex].priority) {
             maxIndex = l;
         }
 
         int r = rightChild(i);
 
-        if (r <= size && H[r].priority < H[maxIndex].priority) {
+        if (r <= q->mySize && q->H[r].priority < q->H[maxIndex].priority) {
             maxIndex = r;
         }
 
         if (i != maxIndex) {
-            pswap(&H[i], &H[maxIndex]);
-            shiftDown(maxIndex);
+            pswap(&q->H[i], &q->H[maxIndex]);
+            shiftDown(maxIndex,q);
         }
     }
 }
 
-void insert(struct processEntry p)
+void insert(struct processEntry p,struct priorityQueue* q)
 {
-    size = size + 1;
-    H[size] = p;
+    q->mySize += 1;
+    q->H[q->mySize] = p;
 
-    shiftUp(size);
+    shiftUp(q->mySize,q);
 }
 
-struct processEntry extractMax()
+struct processEntry extractMax(struct priorityQueue* q)
 {
     struct processEntry result ;
 
-    if(isPriorityQueueEmpty())
+    if(isPriorityQueueEmpty(q)) {
         return result;
+    }
+    result = q->H[0];
 
-    result = H[0];
+    q->H[0] = q->H[q->mySize];
+    q->mySize -= 1;
 
-    H[0] = H[size];
-    size = size - 1;
-
-    shiftDown(0);
+    shiftDown(0,q);
     return result;
 }
 
-struct processEntry getMax()
+struct processEntry getMax(struct priorityQueue* q)
 {
-    return H[0];
+    return q->H[0];
 }
 
 
@@ -140,7 +148,7 @@ int main()
     }
     int i = 0;
     printf("Priority Queue : ");
-    while (i <= size) {
+    while (i <= mySize) {
         printf("%d ", H[i].priority);
         i++;
     }
@@ -151,7 +159,7 @@ int main()
 
     printf( "Priority queue after extracting maximum : ");
     int j = 0;
-    while (j <= size) {
+    while (j <= mySize) {
         printf("%d ",H[j].priority);
         j++;
     }

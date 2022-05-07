@@ -8,17 +8,23 @@ int main(int argc, char *argv[])
     int algorithm = 0;
     int Q = 0;
     int numberOfProcesses = 0;
+    int programCounter = 0;
+    int lastProcessId = -1;
     // initiating the Clk
     initClk();
     printf("Hello From Scheduler\n");
 
     printf("%s\n", argv[0]); // schaduler algo number
     printf("%s\n", argv[1]); // quantum of RR
+    printf("%s\n", argv[2]); // quantum of RR
 
     algorithm = atoi(argv[0]);
     Q = atoi(argv[1]);
+    numberOfProcesses = atoi(argv[2])+1;
 
-
+    //open the output file
+    FILE* outputFile = fopen("scheduler.log","w");
+    fprintf(outputFile,"# At time x process y state arr w total z remain j wait k\n");
     // creating connection between it and the process_generator
     key_t key = ftok("keyFile", 'c');
     int Queue = msgget(key, IPC_CREAT | 0666);
@@ -45,84 +51,127 @@ int main(int argc, char *argv[])
    * will define the queues that will filled by the schedular
    */
 
+   struct priorityQueue theQueue; //this for HPF and SRTN
+   struct queue *processTableForRR;
    if(algorithm != 3) {
-       initPriorityQueue(numberOfProcesses);
-       (algorithm==1)?setSorting(1): setSorting(0);
+       initPriorityQueue(numberOfProcesses,&theQueue);
+       (algorithm==1)?setSorting(1,&theQueue): setSorting(0,&theQueue);
    }
-
-   struct queue processTableForRR;
+   else {
+       processTableForRR = newQueue(numberOfProcesses);
+   }
 
     // else do the work
     while (1)
     {
-        //we will fork here for algorithm 
+        //we will fork here for algorithm
         int pid = fork();
         if(pid == 0)
         {
+            int status;
             //we are in the child
             //we are in the process assigned for algorithm
             switch (algorithm) {
                 case 1:
-                    HPF();  //extract will get the last element and remove from the queue
+                    status = HPF(theQueue);
+                    exit(status);
                     break;
                 case 2:
-                    exit(SRTN());
+                    status = SRTN(theQueue);
+                    exit(status);
                     break;
                 case 3:
-                    exit(runRoundRobin(&processTableForRR,Q));
+                    status = runRoundRobin(processTableForRR,Q);
+                    exit(status);
                     break;
                 default:
                     break;
             }
-            exit(1);   //general case for HPF
         }
         else
         {
+            struct processEntry ptable[numberOfProcesses];
+            int i=0;
             //we are in the parent process
             while (1) {
                 struct processEntry p;
-                int rec = msgrcv(Queue, &p, /*4 + 4 + 4 + 4 + 8*/ sizeof(struct processEntry), 0, IPC_NOWAIT);
+                int rec = msgrcv(Queue, &p, sizeof(p), 0, IPC_NOWAIT);
                 if (rec != -1) {
-                    printf("recevied process id %d , process art %d \n", p.id, p.arrivalTime);
+                    printf("recevied process id %d , process remaining time %d \n", p.id, p.remainingTime);
                     // add the recevied process to the queue
-                    switch (algorithm) {
-                        case 1:
-                            insert(p);
-                            break;
-                        case 2:
-                            insert(p);
-                            break;
-                        case 3:
-                            enqueue(&processTableForRR, &p);
-                            break;
-                        default:
-                            break;
-                    }
+                    ptable[i] = p;
                     // [nabil] : why sleep
                     //sleep(1);
+                    i++;
                 }
                 //check if the child process exited
-                int *chldstate;
+                int chldstate = 0;
                 //Return value of waitpid()
                 //    pid of child, if child has exited
                 //    0, if using WNOHANG and child hasn’t exited.
-                int stateOfChld = waitpid(pid, chldstate, WNOHANG);
+                int stateOfChld = waitpid(-1, &chldstate, WNOHANG);
                 if (stateOfChld > 0)
                 {
-                    if(WEXITSTATUS(*chldstate))
+                    if(WEXITSTATUS(chldstate)) {
                         switch (algorithm) {
-                        case 1 :
-                            extractMax();
-                            break;
-                        case 2:
-                            extractMax();
-                            break;
-                        case 3:
-                            dequeue(&processTableForRR);
-                            break;
-                        default:
-                            break;
+                            case 1 :
+                                extractMax(&theQueue);
+                                programCounter++;
+                                //printf("extract max with id %d  \n", extractMax(&theQueue).id);
+                                if(programCounter == numberOfProcesses)
+                                {
+                                    destroyClk(true);
+                                }
+                                break;
+                            case 2:
+                                extractMax(&theQueue);
+                                programCounter++;
+                                if(programCounter == numberOfProcesses - 1 )
+                                    destroyClk(true);
+                                break;
+                            case 3:
+                                dequeue(processTableForRR);
+                                programCounter++;
+                                if(programCounter == numberOfProcesses)
+                                    destroyClk(true);
+                                break;
+                            default:
+                                break;
                         }
+                    }
+                    else
+                    {
+                        struct processEntry temp;
+                        switch(algorithm)
+                        {
+                            case 2:
+                                temp = extractMax(&theQueue);
+                                temp.remainingTime-=1;
+                                insert(temp,&theQueue);
+                                break;
+                            case 3:
+                                if(!isEmpty(processTableForRR)) {
+                                    temp = *front(processTableForRR);
+                                    dequeue(processTableForRR);
+                                    temp.remainingTime -= Q;
+                                    enqueue(processTableForRR,&temp);
+                                }
+                                break;
+                        }
+                    }
+                    if(algorithm!=3){
+                        for(int j=0;j<i;j++)
+                        {
+                            insert(ptable[j],&theQueue);
+                        }
+                    }
+                    else
+                    {
+                        for(int j=0;j<i;j++)
+                        {
+                            enqueue(processTableForRR,&ptable[j]);
+                        }
+                    }
                     break; //break the inner loop to call the algorithms again
                 }
             }
@@ -130,7 +179,8 @@ int main(int argc, char *argv[])
         // if recevied do something
 
     }
-
+    printf("I broke the outer loop \n");
     // upon termination release the clock resources.
+    fclose(outputFile);
     destroyClk(true);
 }
