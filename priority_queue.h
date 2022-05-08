@@ -22,7 +22,7 @@ void initPriorityQueue(int sizeOfQueue,struct priorityQueue* q)
     for(int i = 0 ; i < sizeOfQueue ; i++ )
     {
         q->H[i].priority = 100000000;
-        q->H[i].id=500;
+        q->H[i].id = -1;
     }
     q->mySize=-1;
     q->sorting=1;

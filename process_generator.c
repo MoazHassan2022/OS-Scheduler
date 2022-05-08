@@ -114,7 +114,7 @@ int main(int argc, char * argv[])
     {
         // work on the Clock
         x=getClk() ;
-        printf("current time is %d\n", x);
+        //printf("current time is %d\n", x);
         if(x >= ptable[counter].arrivalTime) // if it is the time for it to be sent then send it to the schedular
         {
 
@@ -128,7 +128,7 @@ int main(int argc, char * argv[])
             }
         }
 
-        sleep(1);   // sleep the second of the clock
+        //sleep(1);   // sleep the second of the clock
     }
     // 7. Clear clock resources
     //destroyClk(true);

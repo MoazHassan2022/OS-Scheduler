@@ -73,16 +73,17 @@ void destroyClk(bool terminateAll)
 
 
 void waitTillProcessFinishes(int remainingtime){
-    int lastClk = getClk();
-    int currentClk = lastClk;
-    while (remainingtime > 0)
-    {
-        currentClk = getClk();
-        if(currentClk != lastClk){
-            remainingtime -= (currentClk - lastClk);
-        }
-        lastClk = currentClk;
-    }
+    sleep(remainingtime);
+//    int lastClk = getClk();
+//    int currentClk = lastClk;
+//    while (remainingtime > 0)
+//    {
+//        currentClk = getClk();
+//        if(currentClk != lastClk){
+//            remainingtime -= (currentClk - lastClk);
+//        }
+//        lastClk = currentClk;
+//    }
 }
 
 
@@ -139,8 +140,6 @@ void enqueue(struct queue *pt, struct processEntry* x)
     pt->rear = (pt->rear + 1) % pt->maxqueueSize;    // circular queue
     pt->items[pt->rear] = *x;
     pt->queueSize++;
-
-    printf("front = %d, rear = %d\n", pt->front, pt->rear);
 }
 
 void dequeue(struct queue *pt)
@@ -154,5 +153,4 @@ void dequeue(struct queue *pt)
     pt->front = (pt->front + 1) % pt->maxqueueSize;  // circular queue
     pt->queueSize--;
 
-    printf("front = %d, rear = %d\n", pt->front, pt->rear);
 }

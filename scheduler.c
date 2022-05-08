@@ -4,7 +4,7 @@
 
 int main(int argc, char *argv[])
 {
-    sleep(2);
+    //sleep(2);
     int algorithm = 0;
     int Q = 0;
     int numberOfProcesses = 0;
@@ -31,18 +31,18 @@ int main(int argc, char *argv[])
     printf("Queue id is %d\n", Queue);
 
     // TODO implement the scheduler :)
-    
+
     /*
     * the schedular will treat with each algotithm by different way
     * * RR -> will define a circular queue
     * * HPF -> will define a priority queue
-    * * SRTN -> will define a priority queue 
-    * * RR -> will block quantum 
+    * * SRTN -> will define a priority queue
+    * * RR -> will block quantum
     * * HPF -> will block until current process terminate
     * * SRTN -> will block 1 clock edge
-    *  VERY IMPORTANT NOTE : THE SCHEDULAR SHOULD WORK WHILE ALGORITHM IS BLOCKING TO RECEIVE NEW PROCESSES IN QUEUES 
+    *  VERY IMPORTANT NOTE : THE SCHEDULAR SHOULD WORK WHILE ALGORITHM IS BLOCKING TO RECEIVE NEW PROCESSES IN QUEUES
     *  TO MAKE THIS I SUGGEST WE WILL DEFINE FORK FOR ALGORITHM AND DEFINE SHARED MEMORY BETWEEN ALGORITHM(CHILD) AND THE SCHEDULAR(PARENT)
-    *  WILL CHECK EVERY ITERATION IF THE ALGORITHM EXITED OR NOT TO CALL IT AGAIN WITH THE NEW PROCESS TABLE 
+    *  WILL CHECK EVERY ITERATION IF THE ALGORITHM EXITED OR NOT TO CALL IT AGAIN WITH THE NEW PROCESS TABLE
     */
 
 
@@ -100,8 +100,6 @@ int main(int argc, char *argv[])
                     printf("recevied process id %d , process remaining time %d \n", p.id, p.remainingTime);
                     // add the recevied process to the queue
                     ptable[i] = p;
-                    // [nabil] : why sleep
-                    //sleep(1);
                     i++;
                 }
                 //check if the child process exited
@@ -112,32 +110,22 @@ int main(int argc, char *argv[])
                 int stateOfChld = waitpid(-1, &chldstate, WNOHANG);
                 if (stateOfChld > 0)
                 {
+                    struct processEntry pr;
                     if(WEXITSTATUS(chldstate)) {
                         switch (algorithm) {
-                            case 1 :
-                                extractMax(&theQueue);
-                                programCounter++;
-                                //printf("extract max with id %d  \n", extractMax(&theQueue).id);
-                                if(programCounter == numberOfProcesses)
-                                {
-                                    destroyClk(true);
-                                }
-                                break;
-                            case 2:
-                                extractMax(&theQueue);
-                                programCounter++;
-                                if(programCounter == numberOfProcesses - 1 )
-                                    destroyClk(true);
-                                break;
                             case 3:
+                                pr= *front(processTableForRR);
+                                printf("process %d finishes at time %d \n",pr.id,getClk());
                                 dequeue(processTableForRR);
-                                programCounter++;
-                                if(programCounter == numberOfProcesses)
-                                    destroyClk(true);
                                 break;
                             default:
+                                extractMax(&theQueue); // this statement was above in case 2 and case 1 but we put in default
                                 break;
                         }
+                        //this statement is general for ending process (the process of the algorithm exited by 1)
+                        programCounter++;
+                        if(programCounter == numberOfProcesses)
+                            destroyClk(true);
                     }
                     else
                     {
@@ -145,9 +133,11 @@ int main(int argc, char *argv[])
                         switch(algorithm)
                         {
                             case 2:
-                                temp = extractMax(&theQueue);
-                                temp.remainingTime-=1;
-                                insert(temp,&theQueue);
+                                if(!isPriorityQueueEmpty(&theQueue)) {
+                                    temp = extractMax(&theQueue);
+                                    temp.remainingTime -= 1;
+                                    insert(temp, &theQueue);
+                                }
                                 break;
                             case 3:
                                 if(!isEmpty(processTableForRR)) {

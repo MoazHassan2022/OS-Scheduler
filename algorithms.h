@@ -4,7 +4,6 @@ int HPF(struct priorityQueue Q)
     if(isPriorityQueueEmpty(&Q))
         return 0;
     struct processEntry currentProcess = getMax(&Q);
-    printf("process id %d has started and its remaining time is %d \n",currentProcess.id,currentProcess.remainingTime);
     int pid = fork(); // schedule the process for the remaining time passed to it
     if (pid == 0)
     {
@@ -16,7 +15,7 @@ int HPF(struct priorityQueue Q)
     }
     else{
         waitTillProcessFinishes(currentProcess.remainingTime);
-        printf("Process %d finishes...\n", currentProcess.id);
+        printf("Process %d finishes at time %d \n", currentProcess.id,getClk());
     }
     return 1;
 }
@@ -30,16 +29,17 @@ int runRoundRobin(struct queue * currentQueue, int quantum){ // returns if proce
     if(isEmpty(currentQueue))
         return 0;
     struct processEntry* pr = front(currentQueue);
-    printf("process %d has started and its remaining time is %d \n",pr->id,pr->remainingTime);
+    printf("the process id %d has started and the remaining time %d \n",pr->id,pr->remainingTime);
+    int processRemainingTime = pr->remainingTime;
     int remainingTime;
-    if(pr->remainingTime <= 0){
-        dequeue(currentQueue); // finished
+    if(processRemainingTime <= 0){
+        //dequeue(currentQueue); // finished
         //this case is theoritcally impossible but actually we will have to dequeue this process from queue so will return 1
-        printf("process %d finishes \n",pr->id);
+        //printf("process %d finishes at time %d \n",pr->id,getClk());
         return 1;
     }
-    if(pr->remainingTime <= quantum)
-        remainingTime = pr->remainingTime;
+    if(processRemainingTime <= quantum)
+        remainingTime = processRemainingTime;
     else
         remainingTime = quantum;
     int pid = fork(); // schedule the process for the remaining time passed to it
@@ -52,17 +52,16 @@ int runRoundRobin(struct queue * currentQueue, int quantum){ // returns if proce
             perror("Coulden't execv");
     }
     else{
-        dequeue(currentQueue);
-        waitTillProcessFinishes(pr->remainingTime);
-        pr->remainingTime -= remainingTime;
-        printf("process %d stopped and its remaining time %d \n",pr->id,pr->remainingTime);
-        if(pr->remainingTime > 0) {
-            enqueue(currentQueue, pr);
+        //dequeue(currentQueue);
+        waitTillProcessFinishes(remainingTime);
+        processRemainingTime -= remainingTime;
+        //enqueue(currentQueue, pr);
+        if(processRemainingTime > 0) {
             return 0;
         }
         else
         {
-            printf("Process %d finishes...", pr->id);
+            //printf("Process %d finishes at time %d \n", pr->id,getClk());
             return 1;
         }
     }
@@ -70,12 +69,11 @@ int runRoundRobin(struct queue * currentQueue, int quantum){ // returns if proce
 
 
 int SRTN(struct priorityQueue q){ // returns time spent
-    struct processEntry pr =  getMax(&q);
-    printf("process id %d has started and its remaining time is %d \n",pr.id,pr.remainingTime);
-    int remainingTime= 0 ;
-
     if(isPriorityQueueEmpty(&q))
         return 0;
+    struct processEntry pr =  getMax(&q);
+    int remainingTime= 0 ;
+
 
     // setting pr to the process with the shortest time
 
@@ -96,15 +94,13 @@ int SRTN(struct priorityQueue q){ // returns time spent
     }
     else{
         pr = extractMax(&q);
-        printf("the process %d has started and its remaining time is %d \n",pr.id,pr.remainingTime);
         waitTillProcessFinishes(1);
         pr.remainingTime -= 1;
-        printf("the process %d has stopped and its remaining time is %d \n",pr.id,pr.remainingTime);
         if(pr.remainingTime > 0)
             insert(pr,&q);
         else
         {
-            printf("Process %d finishes...", pr.id);
+            printf("Process %d finishes at time %d \n", pr.id,getClk());
             return 1 ;
         }
     }
