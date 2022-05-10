@@ -1,7 +1,7 @@
 #include "algorithms.h"
 //this include contains the headers file
 
-
+void terminateScheduler(int*finishTime, int numberofProcesses);
 int main(int argc, char *argv[])
 {
     //sleep(2);
@@ -93,6 +93,12 @@ int main(int argc, char *argv[])
             struct processEntry ptable[numberOfProcesses];
             int i=0;
             //we are in the parent process
+
+            /*
+            this for test only
+            */
+            int* finishTime = malloc (sizeof(int)*numberOfProcesses);
+
             while (1) {
                 struct processEntry p;
                 int rec = msgrcv(Queue, &p, sizeof(p), 0, IPC_NOWAIT);
@@ -117,15 +123,18 @@ int main(int argc, char *argv[])
                                 pr= *front(processTableForRR);
                                 printf("process %d finishes at time %d \n",pr.id,getClk());
                                 dequeue(processTableForRR);
+                                finishTime[pr.id - 1] = getClk();
                                 break;
                             default:
-                                extractMax(&theQueue); // this statement was above in case 2 and case 1 but we put in default
+                                pr = extractMax(&theQueue); // this statement was above in case 2 and case 1 but we put in default
+                                finishTime[pr.id-1] = getClk();
                                 break;
                         }
                         //this statement is general for ending process (the process of the algorithm exited by 1)
                         programCounter++;
-                        if(programCounter == numberOfProcesses)
-                            destroyClk(true);
+                        if(programCounter == numberOfProcesses) {
+                            terminateScheduler(finishTime, numberOfProcesses);
+                        }   //destroyClk(true);
                     }
                     else
                     {
@@ -136,7 +145,8 @@ int main(int argc, char *argv[])
                                 if(!isPriorityQueueEmpty(&theQueue)) {
                                     temp = extractMax(&theQueue);
                                     temp.remainingTime -= 1;
-                                    insert(temp, &theQueue);
+                                    ptable[i] = temp;
+                                    i++;
                                 }
                                 break;
                             case 3:
@@ -144,7 +154,8 @@ int main(int argc, char *argv[])
                                     temp = *front(processTableForRR);
                                     dequeue(processTableForRR);
                                     temp.remainingTime -= Q;
-                                    enqueue(processTableForRR,&temp);
+                                    ptable[i] = temp;
+                                    i++;
                                 }
                                 break;
                         }
@@ -172,5 +183,19 @@ int main(int argc, char *argv[])
     printf("I broke the outer loop \n");
     // upon termination release the clock resources.
     fclose(outputFile);
+    destroyClk(true);
+}
+
+
+void terminateScheduler(int* finishTime,int numberofProcesses)
+{
+    printf("%s \n","i terminated");
+    //before destroy clock will out put the result to file to test it
+    FILE * testFile = fopen("test","w");
+    for(int i = 0;i<numberofProcesses;i++)
+    {
+        fprintf(testFile,"%d \n",finishTime[i]);
+    }
+    fclose(testFile);
     destroyClk(true);
 }
