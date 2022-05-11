@@ -20,12 +20,12 @@ int main(int argc, char *argv[])
 
     algorithm = atoi(argv[0]);
     Q = atoi(argv[1]);
-    numberOfProcesses = atoi(argv[2])+1;
+    numberOfProcesses = atoi(argv[2]);
 
     //open the output file
-    FILE* outputFile = fopen("scheduler.log","w");
-    fprintf(outputFile,"# At time x process y state arr w total z remain j wait k\n");
-    // creating connection between it and the process_generator
+//    FILE* outputFile = fopen("scheduler.log","w");
+//    fprintf(outputFile,"# At time x process y state arr w total z remain j wait k\n");
+//    // creating connection between it and the process_generator
     key_t key = ftok("keyFile", 'c');
     int Queue = msgget(key, IPC_CREAT | 0666);
     printf("Queue id is %d\n", Queue);
@@ -182,14 +182,13 @@ int main(int argc, char *argv[])
     }
     printf("I broke the outer loop \n");
     // upon termination release the clock resources.
-    fclose(outputFile);
+//    fclose(outputFile);
     destroyClk(true);
 }
 
 
-void terminateScheduler(int* finishTime,int numberofProcesses)
+void terminateScheduler(int finishTime[],int numberofProcesses)
 {
-    printf("%s \n","i terminated");
     //before destroy clock will out put the result to file to test it
     FILE * testFile = fopen("test","w");
     for(int i = 0;i<numberofProcesses;i++)

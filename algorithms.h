@@ -4,6 +4,7 @@ int HPF(struct priorityQueue Q)
     if(isPriorityQueueEmpty(&Q))
         return 0;
     struct processEntry currentProcess = getMax(&Q);
+
     int pid = fork(); // schedule the process for the remaining time passed to it
     if (pid == 0)
     {
@@ -14,8 +15,25 @@ int HPF(struct priorityQueue Q)
             perror("Coulden't execv");
     }
     else{
+        //the output task
+        int time  = getClk();
+        int arr = currentProcess.arrivalTime;
+        int total = currentProcess.runningTime;
+        int remain = currentProcess.remainingTime;
+        int wait = time - arr - (total - remain);
+        FILE *output = fopen("scheduler.log","a");
+        if(remain==total)
+        {
+            fprintf(output,"At time %d process %d started arr %d total %d remain %d wait %d \n",time,currentProcess.id,arr,total,remain,wait);
+        }
+        else{
+            fprintf(output,"At time %d process %d resumed arr %d total %d remain %d wait %d \n",time,currentProcess.id,arr,total,remain,wait);
+        }
         waitTillProcessFinishes(currentProcess.remainingTime);
+        time = getClk();
         printf("Process %d finishes at time %d \n", currentProcess.id,getClk());
+        fprintf(output,"At time %d process %d finished arr %d total %d remain %d wait %d \n",time,currentProcess.id,arr,total,0,wait);
+        fclose(output);
     }
     return 1;
 }
@@ -52,18 +70,39 @@ int runRoundRobin(struct queue * currentQueue, int quantum){ // returns if proce
             perror("Coulden't execv");
     }
     else{
+        //the output task
+        int time  = getClk();
+        int arr = pr->arrivalTime;
+        int total = pr->runningTime;
+        int remain = pr->remainingTime;
+        int wait = time - arr - (total - remain);
+        FILE *output = fopen("scheduler.log","a");
+        if(remain==total)
+        {
+            fprintf(output,"At time %d process %d started arr %d total %d remain %d wait %d \n",time,pr->id,arr,total,remain,wait);
+        }
+        else{
+            fprintf(output,"At time %d process %d resumed arr %d total %d remain %d wait %d \n",time,pr->id,arr,total,remain,wait);
+        }
         //dequeue(currentQueue);
         waitTillProcessFinishes(remainingTime);
+        time = getClk();
         processRemainingTime -= remainingTime;
         //enqueue(currentQueue, pr);
         if(processRemainingTime > 0) {
+
+            fprintf(output,"At time %d process %d stopped arr %d total %d remain %d wait %d \n",time,pr->id,arr,total,processRemainingTime,wait);
+            fclose(output);
             return 0;
         }
         else
         {
+            fprintf(output,"At time %d process %d finished arr %d total %d remain %d wait %d \n",time,pr->id,arr,total,processRemainingTime,wait);
             //printf("Process %d finishes at time %d \n", pr->id,getClk());
+            fclose(output);
             return 1;
         }
+
     }
 }
 
