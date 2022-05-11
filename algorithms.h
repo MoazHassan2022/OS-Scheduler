@@ -31,8 +31,10 @@ int HPF(struct priorityQueue Q)
         }
         waitTillProcessFinishes(currentProcess.remainingTime);
         time = getClk();
+        int TA  = currentProcess.runningTime+wait;
+        float WTA =((float)TA)/currentProcess.runningTime;
         printf("Process %d finishes at time %d \n", currentProcess.id,getClk());
-        fprintf(output,"At time %d process %d finished arr %d total %d remain %d wait %d \n",time,currentProcess.id,arr,total,0,wait);
+        fprintf(output,"At time %d process %d finished arr %d total %d remain %d wait %d TA %d WTA %f\n",time,currentProcess.id,arr,total,0,wait,TA,WTA);
         fclose(output);
     }
     return 1;
@@ -97,7 +99,9 @@ int runRoundRobin(struct queue * currentQueue, int quantum){ // returns if proce
         }
         else
         {
-            fprintf(output,"At time %d process %d finished arr %d total %d remain %d wait %d \n",time,pr->id,arr,total,processRemainingTime,wait);
+            int TA  = pr->runningTime+wait;
+            float WTA =((float)TA)/pr->runningTime;
+            fprintf(output,"At time %d process %d finished arr %d total %d remain %d wait %d TA %d WTA %f\n",time,pr->id,arr,total,processRemainingTime,wait,TA,WTA);
             //printf("Process %d finishes at time %d \n", pr->id,getClk());
             fclose(output);
             return 1;
@@ -132,13 +136,35 @@ int SRTN(struct priorityQueue q){ // returns time spent
         exit(0);
     }
     else{
+        //the output task
+        int time  = getClk();
+        int arr = pr.arrivalTime;
+        int total = pr.runningTime;
+        int remain = pr.remainingTime;
+        int wait = time - arr - (total - remain);
+        FILE *output = fopen("scheduler.log","a");
+        if(remain==total)
+        {
+            fprintf(output,"At time %d process %d started arr %d total %d remain %d wait %d \n",time,pr.id,arr,total,remain,wait);
+        }
+        else{
+            fprintf(output,"At time %d process %d resumed arr %d total %d remain %d wait %d \n",time,pr.id,arr,total,remain,wait);
+        }
         pr = extractMax(&q);
         waitTillProcessFinishes(1);
         pr.remainingTime -= 1;
-        if(pr.remainingTime > 0)
-            insert(pr,&q);
+        time = getClk();
+        if(pr.remainingTime > 0) {
+            fprintf(output,"At time %d process %d stopped arr %d total %d remain %d wait %d \n",time,pr.id,arr,total,pr.remainingTime ,wait);
+            insert(pr, &q);
+        }
         else
         {
+            int TA  = pr.runningTime+wait;
+            float WTA =((float)TA)/pr.runningTime;
+            fprintf(output,"At time %d process %d finished arr %d total %d remain %d wait %d TA %d WTA %f\n",time,pr.id,arr,total,pr.remainingTime ,wait,TA,WTA);
+            //printf("Process %d finishes at time %d \n", pr->id,getClk());
+            fclose(output);
             printf("Process %d finishes at time %d \n", pr.id,getClk());
             return 1 ;
         }
