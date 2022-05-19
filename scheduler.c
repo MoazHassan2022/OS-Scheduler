@@ -53,6 +53,7 @@ int main(int argc, char *argv[])
 
    struct priorityQueue theQueue; //this for HPF and SRTN
    struct queue *processTableForRR;
+   struct queue *hardDisk = newQueue(numberOfProcesses);
    if(algorithm != 3) {
        initPriorityQueue(numberOfProcesses,&theQueue);
        (algorithm==1)?setSorting(1,&theQueue): setSorting(0,&theQueue);
@@ -123,12 +124,31 @@ int main(int argc, char *argv[])
                                 pr= *front(processTableForRR);
                                 printf("process %d finishes at time %d \n",pr.id,getClk());
                                 dequeue(processTableForRR);
+                                // deallocate(pr.processMemory);
                                 finishTime[pr.id - 1] = getClk();
                                 break;
                             default:
                                 pr = extractMax(&theQueue); // this statement was above in case 2 and case 1 but we put in default
+                                // deallocate(pr.processMemory);
                                 finishTime[pr.id-1] = getClk();
                                 break;
+                        }
+                        while(!isEmpty(hardDisk)) {
+                              pr = *front(hardDisk);
+                              // insert into memory : bool result = allocate(pr.memSize);
+                              if(result != -1){
+                                   dequeue(hardDisk);
+                                   switch (algorithm) {
+                                        case 3:
+                                            enqueue(processTableForRR,&pr);
+                                            break;
+                                        default:
+                                            insert(pr,&theQueue);
+                                            break;
+                                    }     
+                              }
+                              else
+                                    break;
                         }
                         //this statement is general for ending process (the process of the algorithm exited by 1)
                         programCounter++;
@@ -160,18 +180,35 @@ int main(int argc, char *argv[])
                                 break;
                         }
                     }
+                    int continueIndex = 0;
                     if(algorithm!=3){
                         for(int j=0;j<i;j++)
                         {
-                            insert(ptable[j],&theQueue);
+                            // insert into memory : bool result = allocate(ptable[j].memSize);
+                            if(result != -1){
+                                insert(ptable[j],&theQueue);
+                                continueIndex++;
+                            }
+                            else
+                                break;
                         }
                     }
                     else
                     {
                         for(int j=0;j<i;j++)
                         {
-                            enqueue(processTableForRR,&ptable[j]);
+                            // insert into memory : bool result = allocate(ptable[j].memSize);
+                            if(result != -1){
+                                enqueue(processTableForRR,&ptable[j]);
+                                continueIndex++;
+                            }
+                            else
+                                break;
                         }
+                    }
+                    for(int j=continueIndex;j<i;j++)
+                    {
+                        enqueue(hardDisk,&ptable[j]);
                     }
                     break; //break the inner loop to call the algorithms again
                 }

@@ -32,3 +32,12 @@ struct processMsgBuff
    long mtype;
    struct processEntry mProcess;
 };
+
+struct process_memory {
+    int Process_start_location;
+    int Process_end_location;
+};
+void init_process_memory(struct process_memory* prm, int s, int en) {
+      prm->Process_start_location = s;
+      prm->Process_end_location = en; 
+}
