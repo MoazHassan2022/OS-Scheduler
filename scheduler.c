@@ -1,4 +1,5 @@
 #include "algorithms.h"
+#include "Bud.h"
 //this include contains the headers file
 
 void terminateScheduler(int*finishTime, int numberofProcesses);
@@ -10,6 +11,7 @@ int main(int argc, char *argv[])
     int numberOfProcesses = 0;
     int programCounter = 0;
     int lastProcessId = -1;
+    Buddy();
     // initiating the Clk
     initClk();
     printf("Hello From Scheduler\n");
@@ -124,19 +126,20 @@ int main(int argc, char *argv[])
                                 pr= *front(processTableForRR);
                                 printf("process %d finishes at time %d \n",pr.id,getClk());
                                 dequeue(processTableForRR);
-                                // deallocate(pr.processMemory);
+                                deallocate(pr.prm);
                                 finishTime[pr.id - 1] = getClk();
                                 break;
                             default:
                                 pr = extractMax(&theQueue); // this statement was above in case 2 and case 1 but we put in default
-                                // deallocate(pr.processMemory);
+                                deallocate(pr.prm);
                                 finishTime[pr.id-1] = getClk();
                                 break;
                         }
                         while(!isEmpty(hardDisk)) {
                               pr = *front(hardDisk);
                               // insert into memory : bool result = allocate(pr.memSize);
-                              if(result != -1){
+                              struct process_memory result = allocate(pr.memSize);
+                              if(result.Process_start_location != -1){
                                    dequeue(hardDisk);
                                    switch (algorithm) {
                                         case 3:
@@ -185,7 +188,8 @@ int main(int argc, char *argv[])
                         for(int j=0;j<i;j++)
                         {
                             // insert into memory : bool result = allocate(ptable[j].memSize);
-                            if(result != -1){
+                            struct process_memory result = allocate(pr.memSize);
+                            if(result.Process_start_location != -1){
                                 insert(ptable[j],&theQueue);
                                 continueIndex++;
                             }
@@ -198,7 +202,8 @@ int main(int argc, char *argv[])
                         for(int j=0;j<i;j++)
                         {
                             // insert into memory : bool result = allocate(ptable[j].memSize);
-                            if(result != -1){
+                            struct process_memory result = allocate(pr.memSize);
+                            if(result.Process_start_location != -1){
                                 enqueue(processTableForRR,&ptable[j]);
                                 continueIndex++;
                             }
