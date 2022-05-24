@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "priority_queue.h"
 
 
 #define VECTOR_INITIAL_CAPACITY 16

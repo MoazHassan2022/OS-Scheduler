@@ -1,5 +1,4 @@
 #include "algorithms.h"
-#include "Bud.h"
 //this include contains the headers file
 
 void terminateScheduler(int*finishTime, int numberofProcesses);
@@ -184,37 +183,28 @@ int main(int argc, char *argv[])
                         }
                     }
                     int continueIndex = 0;
-                    if(algorithm!=3){
-                        for(int j=0;j<i;j++)
-                        {
-                            // insert into memory : bool result = allocate(ptable[j].memSize);
-                            struct process_memory result = allocate(pr.memSize);
-                            if(result.Process_start_location != -1){
-                                insert(ptable[j],&theQueue);
-                                continueIndex++;
-                            }
-                            else
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        for(int j=0;j<i;j++)
-                        {
-                            // insert into memory : bool result = allocate(ptable[j].memSize);
-                            struct process_memory result = allocate(pr.memSize);
-                            if(result.Process_start_location != -1){
-                                enqueue(processTableForRR,&ptable[j]);
-                                continueIndex++;
-                            }
-                            else
-                                break;
-                        }
-                    }
-                    for(int j=continueIndex;j<i;j++)
+                    for(int j=0;j<i;j++)
                     {
                         enqueue(hardDisk,&ptable[j]);
                     }
+                    while(!isEmpty(hardDisk)) {
+                              pr = *front(hardDisk);
+                              // insert into memory : bool result = allocate(pr.memSize);
+                              struct process_memory result = allocate(pr.memSize);
+                              if(result.Process_start_location != -1){
+                                   dequeue(hardDisk);
+                                   switch (algorithm) {
+                                        case 3:
+                                            enqueue(processTableForRR,&pr);
+                                            break;
+                                        default:
+                                            insert(pr,&theQueue);
+                                            break;
+                                    }     
+                              }
+                              else
+                                    break;
+                        }
                     break; //break the inner loop to call the algorithms again
                 }
             }

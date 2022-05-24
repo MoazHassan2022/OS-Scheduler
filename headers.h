@@ -12,7 +12,7 @@
 #include <signal.h>
 #include <string.h>
 #include <limits.h>
-#include "priority_queue.h"
+#include "Bud.h"
 
 
 #define SHKEY 300
