@@ -1,5 +1,6 @@
 #include "headers.h"
 
+void handler(int signum);
 /* Modify this file as needed*/
 int remainingtime;
 
@@ -17,8 +18,17 @@ int main(int agrc, char * argv[])
             printf("remaining %d\n", remainingtime);
         }
         lastClk = currentClk;
+        signal(SIGUSR2,handler);
     }
     destroyClk(false);
 
     exit(0);
+}
+
+void handler(int signum)
+{
+    if(signum==SIGUSR2)
+    {
+        exit(0);
+    }
 }

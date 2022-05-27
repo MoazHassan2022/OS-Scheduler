@@ -25,12 +25,12 @@ struct queue* newQueue(int qs)
 
     return pt;
 }
-
 int size(struct queue *pt) {
     return pt->queueSize;
 }
 
 int isEmpty(struct queue *pt) {
+    printf("HardDisk Used size = %d", size(pt));
     return !size(pt);
 }
 

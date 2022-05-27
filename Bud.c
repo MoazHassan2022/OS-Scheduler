@@ -37,10 +37,9 @@ struct process_memory allocate(int process_size)
         int i;
         for (i = x + 1; i <= size + 1; i++)
             if(!is_empty(&arr[i]) > 0) break;
-
         if (i > size)
         {
-            printf("Sorry, No enough memory ya moza\n");
+            printf("Sorry, Not enough memory ya moza\n");
             struct process_memory prm = init_process_memory(-1, -1);
             return prm;
         }
@@ -54,6 +53,8 @@ struct process_memory allocate(int process_size)
                 // divide the big to two small 
                 process_memory pair1 = init_process_memory(temp.Process_start_location, temp.Process_start_location + (temp.Process_end_location - temp.Process_start_location) / 2);
                 process_memory pair2 = init_process_memory(temp.Process_start_location + (temp.Process_end_location - temp.Process_start_location + 1) / 2, temp.Process_end_location);
+                printf("pair1 from %d to %d allocated\n", pair1.Process_start_location, pair1.Process_end_location);
+                printf("pair2 from %d to %d allocated\n", pair2.Process_start_location, pair2.Process_end_location);
                 // push them 
                 push_back(&arr[i],pair1);
                 push_back(&arr[i],pair2);
@@ -137,10 +138,12 @@ void deallocate(struct process_memory * p)
     }
 }
 
-/*// Driver code 
+// Driver code 
 int main() 
 { 
     Buddy(); 
-    
+    struct process_memory result = allocate(200);
+    deallocate(&result);
+    result = allocate(90);
     return 0; 
-}*/
+}

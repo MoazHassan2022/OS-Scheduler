@@ -14,11 +14,11 @@ typedef struct {
 } Vector;
 
 void init(Vector *vector){
-{
-    vector->size = 0;
-    vector->capacity = VECTOR_INITIAL_CAPACITY;
-    vector->data = malloc(sizeof(process_memory) * vector->capacity);
-}
+    {
+        vector->size = 0;
+        vector->capacity = VECTOR_INITIAL_CAPACITY;
+        vector->data = malloc(sizeof(process_memory) * vector->capacity);
+    }
 
 };
 
@@ -38,7 +38,7 @@ void push_back(Vector *vector, process_memory value){
 
 void set(Vector *vector, int index, process_memory value){
     process_memory p;
-        p.Process_start_location = -1;
+    p.Process_start_location = -1;
     p.Process_end_location = -1;
     while(index >= vector->size){
         push_back(vector, p);
@@ -54,11 +54,16 @@ void push_front(Vector *vector, process_memory value){
 }
 
 
-void delete(Vector *vector, int index){
-    for(int i = 0; i < index; i++){
-        vector->data[index + i] = vector->data[index + i + 1];
+void delete(Vector *v, int index){
+    int i = 0;
+    v->data[5];
+    if ((index < 0) || (index >= v->size))
+        return ;
+    for (i = index; (i < v->size - 1); ++i)
+    {
+        v->data[i] = v->data[i + 1];
     }
-    vector->size--;
+    v->size--;
 }
 
 

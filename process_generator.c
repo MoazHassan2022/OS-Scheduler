@@ -17,15 +17,17 @@ int main(int argc, char * argv[])
     else
         printf("Queue id is %d\n" , Queue);
 
+
     //1. Reading the file
     FILE* file ;
     char line[100] ;
-    file = fopen("processes.txt", "a+");
+    file = fopen("processes.txt", "r");
 
     if(file == NULL)
         printf("Can't Open The File\n");
 
     long processesCounter = 0 ;
+
     while (fgets(line, sizeof(line) , file))
     {
         if(line[0] == '#')
@@ -34,11 +36,10 @@ int main(int argc, char * argv[])
     }
 
     printf("process Counter = %li \n" , processesCounter);
-
     fclose(file);
-    file = fopen("processes.txt", "a+");
 
-    struct processEntry*ptable  = malloc(processesCounter * 40) ;  // ana hena ghalebn h2ra el file mrten 34an a3rf el size
+    file = fopen("processes.txt", "r");
+    struct processEntry*ptable  = malloc(processesCounter * sizeof(processEntry)) ;  // ana hena ghalebn h2ra el file mrten 34an a3rf el size
     processesCounter = 0 ;
     char c[100] ;
     while (fscanf(file , "%s" ,  c) == 1)
@@ -46,23 +47,23 @@ int main(int argc, char * argv[])
         if(c[0] == '#')
         {
             char ignore[1024];
-            fgets(ignore, sizeof(ignore), file);
+            fgets(ignore, sizeof(ignore), file); // ignore the whole line
         }
         else
         {
-            struct processEntry* p = malloc(40);  // create new proccess
+            struct processEntry* p = malloc(sizeof(processEntry));  // create new proccess
             p->header = 1 ; // setting the header always equal to 1
             sscanf(c , "%d" , &p->id);
             if(p->id == 0)
                 p->id = 1;
-            fscanf(file, "%d %d %d",&p->arrivalTime, &p->runningTime, &p->priority); // read it from the file
+            fscanf(file, "%d %d %d %d",&p->arrivalTime, &p->runningTime, &p->priority, &p->memSize); // read it from the file
             p->remainingTime = p->runningTime ;
             ptable[processesCounter] = *p  ;
             processesCounter++ ;
         }
     }
-
     fclose(file);
+
     // 2. Ask the user for the chosen scheduling algorithm and its parameters, if there are any.
     int schdulAlgoNo = 0 ;
     int Q = 0; // Quantum
@@ -73,9 +74,11 @@ int main(int argc, char * argv[])
         printf("Enter the Quantum you need \n");
         scanf("%d", &Q);
     }
+
     // 3. Initiate and create the scheduler and clock processes.
     int pid ;
     pid = fork();
+    char *s3 ;
     if(pid == 0) {
         if(execv("./clk.out", argv))   // run the program
             perror("Couldent execv");
@@ -88,7 +91,7 @@ int main(int argc, char * argv[])
             // if RR -> send Quantum
             char s1[5] ;
             char s2[5] ;
-            char *s3 = malloc(1 * processesCounter) ;
+            s3 = malloc(processesCounter) ;
             sprintf(s3 , "%ld" , processesCounter) ;
             sprintf(s1 , "%d" , schdulAlgoNo);  // converting the int to string
             sprintf(s2 , "%d" , Q);
@@ -127,12 +130,15 @@ int main(int argc, char * argv[])
                 //exit(-1);
             }
         }
-
         //sleep(1);   // sleep the second of the clock
     }
+
     // 7. Clear clock resources
     //destroyClk(true);
-    free (ptable) ;
+    /*free(s3);
+    for(int i = 0 ; i< processesCounter ; i ++) // freeing all the allocated processes
+        free(&ptable[i]) ;
+    free (ptable) ;*/
     raise(SIGINT);
 }
 

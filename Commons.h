@@ -1,14 +1,14 @@
 #include <stdbool.h>
+/*Struct process data for all processes loaded from input file and processes in ready queue*/
+typedef struct process_memory {
+    int Process_start_location;
+    int Process_end_location;
+} process_memory;
 
-typedef struct process_memory { 
-    int Process_start_location; 
-    int Process_end_location; 
-} process_memory; 
-
-process_memory init_process_memory(int s, int en) { 
+process_memory init_process_memory(int s, int en) {
     struct process_memory prm;
-    prm.Process_start_location = s; 
-    prm.Process_end_location = en;  
+    prm.Process_start_location = s;
+    prm.Process_end_location = en;
     return prm;
 }
 
@@ -25,6 +25,7 @@ struct processEntry {
     long header;
     struct process_memory* prm;
     int memSize;
+    bool isAllocated;
 } processEntry;
 
 
