@@ -101,10 +101,10 @@ int runRoundRobin(struct queue * currentQueue, int quantum){ // returns if proce
         FILE *output = fopen("scheduler.log","a");
         if(remain==total)
         {
-            //fprintf(output,"At time %d process %d started arr %d total %d remain %d wait %d \n",time,pr->id,arr,total,remain,wait);
+            fprintf(output,"At time %d process %d started arr %d total %d remain %d wait %d \n",time,pr->id,arr,total,remain,wait);
         }
         else{
-            //fprintf(output,"At time %d process %d resumed arr %d total %d remain %d wait %d \n",time,pr->id,arr,total,remain,wait);
+            fprintf(output,"At time %d process %d resumed arr %d total %d remain %d wait %d \n",time,pr->id,arr,total,remain,wait);
         }
         //dequeue(currentQueue);
         while(1){
@@ -123,7 +123,7 @@ int runRoundRobin(struct queue * currentQueue, int quantum){ // returns if proce
         //enqueue(currentQueue, pr);
         if(processRemainingTime > 0) {
 
-            //fprintf(output,"At time %d process %d stopped arr %d total %d remain %d wait %d \n",time,pr->id,arr,total,processRemainingTime,wait);
+            fprintf(output,"At time %d process %d stopped arr %d total %d remain %d wait %d \n",time,pr->id,arr,total,processRemainingTime,wait);
             fclose(output);
             return 0;
         }
@@ -211,10 +211,10 @@ int SRTN(struct priorityQueue q){ // returns time spent
         FILE *output = fopen("scheduler.log","a");
         if(remain==total)
         {
-  //          fprintf(output,"At time %d process %d started arr %d total %d remain %d wait %d \n",time,pr.id,arr,total,remain,wait);
+            fprintf(output,"At time %d process %d started arr %d total %d remain %d wait %d \n",time,pr.id,arr,total,remain,wait);
         }
         else{
-    //        fprintf(output,"At time %d process %d resumed arr %d total %d remain %d wait %d \n",time,pr.id,arr,total,remain,wait);
+            fprintf(output,"At time %d process %d resumed arr %d total %d remain %d wait %d \n",time,pr.id,arr,total,remain,wait);
         }
         pr = extractMax(&q);
         up(remSem);

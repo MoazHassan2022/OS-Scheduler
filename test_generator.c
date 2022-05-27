@@ -35,8 +35,8 @@ int main(int argc, char * argv[])
         while (pData.runningtime == 0)
             pData.runningtime = rand() % (30);
         pData.priority = rand() % (11);
-        //pData.memSize = rand() % (256);
-        pData.memSize = rand() % (11);
+        pData.memSize = rand() % (256);
+        //pData.memSize = rand() % (11);
         fprintf(pFile, "%d\t%d\t%d\t%d\t%d\n", pData.id, pData.arrivaltime, pData.runningtime, pData.priority,pData.memSize);
     }
     fclose(pFile);
