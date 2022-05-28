@@ -1,3 +1,17 @@
+#include <stdbool.h>
+/*Struct process data for all processes loaded from input file and processes in ready queue*/
+typedef struct process_memory {
+    int Process_start_location;
+    int Process_end_location;
+} process_memory;
+
+process_memory init_process_memory(int s, int en) {
+    struct process_memory prm;
+    prm.Process_start_location = s;
+    prm.Process_end_location = en;
+    return prm;
+}
+
 /*Struct process data for all processes loaded from input file and processes in ready queue*/
 struct processEntry {
     int id;
@@ -8,6 +22,10 @@ struct processEntry {
     int criteria;
     int PID;
     int runningID; //order of running
+    long header;
+    struct process_memory* prm;
+    int memSize;
+    bool isAllocated;
 } processEntry;
 
 
@@ -29,11 +47,4 @@ struct processMsgBuff
 {
    long mtype;
    struct processEntry mProcess;
-};
-
-/*Enum for Algorithms' choice*/
-enum Algorithm {
-        HPF,
-        SRTN,
-        RoundRobin
 };

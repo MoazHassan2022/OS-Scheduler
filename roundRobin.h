@@ -1,27 +1,23 @@
 #include "headers.h"
-#include "queue.h" // queue and commons
+
 
 /* Modify this file as needed*/
-void waitTillProcessFinishes(int remainingtime){
-    int lastClk = getClk();
-    int currentClk = lastClk;
-    while (remainingtime > 0)
-    {
-        currentClk = getClk();
-        if(currentClk != lastClk){
-            remainingtime -= (currentClk - lastClk);
-        }
-        lastClk = currentClk;
-    }
-}
-int runRoundRobin(struct queue * currentQueue, int quantum){ // returns time spent
+
+
+
+int runRoundRobin(struct queue * currentQueue, int quantum){ // returns if process terminated or not
+    /*
+     * if process terminated ---> will return 1
+     * if process didn't terminated   -->  will return 0
+    */
     if(isEmpty(currentQueue))
         return 0;
-    struct processBlock* pr = front(currentQueue);
+    struct processEntry* pr = front(currentQueue);
     int remainingTime;
     if(pr->remainingTime <= 0){
         dequeue(currentQueue); // finished
-        return 0;
+        //this case is theoritcally impossible but actually we will have to dequeue this process from queue so will return 1
+        return 1;
     }
     if(pr->remainingTime <= quantum)
         remainingTime = pr->remainingTime;
@@ -38,22 +34,29 @@ int runRoundRobin(struct queue * currentQueue, int quantum){ // returns time spe
     }
     else{
         dequeue(currentQueue);
-        waitTillProcessFinishes(remainingTime);
+        waitTillProcessFinishes(pr->remainingTime);
         pr->remainingTime -= remainingTime;
-        if(pr->remainingTime > 0)
+        if(pr->remainingTime > 0) {
             enqueue(currentQueue, pr);
+            return 0;
+        }
         else
-            printf("Process %d finishes...", pr->id);
+        {
+            //printf("Process %d finishes...", pr->id);
+            return 1;
+        }
     }
 }
 
-
+/*
+ *
+ * this for test
 int main(int agrc, char * argv[])
 {
     initClk();
-    struct processBlock* pr[4];
+    struct processEntry* pr[4];
     for(int i = 0; i<4; i++){
-        pr[i] = malloc(sizeof(struct processBlock));
+        pr[i] = malloc(sizeof(struct processEntry));
         pr[i]->remainingTime = (i + 1) * 2;
         pr[i]->id = i+1;
     }
@@ -76,3 +79,4 @@ int main(int agrc, char * argv[])
 
     return 0;
 }
+*/
