@@ -7,11 +7,16 @@
 
 int size = 8;
 
+int dummy = 0;
+
 // the free nodes of various sizes
 Vector arr[9];
 
 void Buddy()
 {
+    FILE *MemoryLog = fopen("memory.log", "w");
+    fprintf(MemoryLog, "#At time x allocated y bytes for Processs z from i to j\n");
+    fclose(MemoryLog);
     for (int i = 0; i < 9; i++){
         init(&arr[i]);
     }
@@ -21,7 +26,7 @@ void Buddy()
     }
 }
 
-struct process_memory allocate(int process_size)
+struct process_memory allocate(int process_size, int id, int clk)
 {
     int x = near_block(process_size);
 
@@ -29,6 +34,10 @@ struct process_memory allocate(int process_size)
     {
         struct process_memory temp = get(&arr[x], 0);
         delete(&arr[x],0);
+        FILE *MemoryLog = fopen("memory.log", "a");
+        fprintf(MemoryLog, "At time %d allocated %d bytes for process %d from %d to %d\n", clk, process_size, id, temp.Process_start_location, temp.Process_end_location);
+        fclose(MemoryLog);
+        dummy++;
         printf("Meomry full size from %d to %d allocated\n", temp.Process_start_location, temp.Process_end_location);
         return temp;
     }
@@ -40,7 +49,7 @@ struct process_memory allocate(int process_size)
 
         if (i > size)
         {
-            printf("Sorry, No enough memory ya moza\n");
+            printf("Sorry, Not enough memory ya moza.\n");
             struct process_memory prm = init_process_memory(-1, -1);
             return prm;
         }
@@ -62,6 +71,10 @@ struct process_memory allocate(int process_size)
                 // remove the big one  
                 delete(&arr[i],0);
             }
+            FILE *MemoryLog = fopen("memory.log", "a");
+            fprintf(MemoryLog, "At time %d allocated %d bytes for process %d from %d to %d\n", clk, process_size, id, temp.Process_start_location, temp.Process_end_location);
+            fclose(MemoryLog);
+            dummy++; 
             printf("Meomry from %d to %d allocated\n", temp.Process_start_location, temp.Process_end_location);
             return temp;
         }
@@ -117,7 +130,7 @@ int merge(int start_of_process, int Process_size)
     return -1;
 }
 
-void deallocate(struct process_memory * p)
+void deallocate(struct process_memory * p, int id, int clk)
 {
     int start_time = p->Process_start_location;
     int s_size = p->Process_end_location - p->Process_start_location + 1;
@@ -127,7 +140,9 @@ void deallocate(struct process_memory * p)
     // Add the block in free array 
     process_memory prm = init_process_memory(start_time, start_time + pow(2, n) - 1);
     push_back(&arr[n],prm);
-
+    FILE *MemoryLog = fopen("memory.log", "a");
+    fprintf(MemoryLog, "At time %d deallocated %d bytes for process %d from %d to %d\n", clk, s_size, id, p->Process_start_location, p->Process_end_location);
+    fclose(MemoryLog);
     printf("Memory block from %d to %d deallocated\n", start_time, (int)(start_time + pow(2, n) - 1) );
     while (1) {
         if (s_size >= 256) break;
