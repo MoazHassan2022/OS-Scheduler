@@ -2,6 +2,7 @@
 //this include contains the headers file
 
 void terminateScheduler(int*finishTime, int numberofProcesses);
+FILE *MemoryLog;
 int main(int argc, char *argv[])
 {
     //sleep(2);
@@ -91,7 +92,8 @@ int main(int argc, char *argv[])
 
     semun.val = 0;
     semctl(sem1, 0, SETVAL, semun);
-
+    MemoryLog = fopen("memory.log", "w");
+    //fprintf(MemoryLog, "#at time x allocated y bytes for Processs z from i to j\n");
 
     // else do the work
     while (1)
@@ -170,9 +172,10 @@ int main(int argc, char *argv[])
                         (*NOOfProcesses)++;
                     }
                     if(algorithm == 2) {
-                        down(remSem);
+                        //down(remSem);
                         int prt1 = *remainingTimeOfTheCurrentProcess;
-                        up(remSem);
+                        printf("remainingTimeOfTheCurrentProcess in scheduler = %d\n", prt1);
+                        //up(remSem);
                         if (p.remainingTime < prt1 && !isPriorityQueueEmpty(&theQueue) && prt1 != 9999) {
                             printf("I raised a SIGUSR1 \n");
                             kill(pid, SIGUSR1);
@@ -198,12 +201,14 @@ int main(int argc, char *argv[])
                                 printf("process %d finishes at time %d \n",pr.id,getClk());
                                 dequeue(processTableForRR);
                                 deallocate(pr.prm);
+                                fprintf(MemoryLog, "at time %d deallocated %d bytes for process %d from %d to %d\n", getClk(), pr.memSize, pr.id, pr.prm->Process_start_location, pr.prm->Process_end_location);
                                 finishTime[pr.id - 1] = getClk();
                                 break;
                             default:
                                 pr = extractMax(&theQueue); // this statement was above in case 2 and case 1 but we put in default
                                 printf("Process %d finishes at time %d \n", pr.id, getClk());
                                 deallocate(pr.prm);
+                                fprintf(MemoryLog, "at time %d deallocated %d bytes for process %d from %d to %d\n", getClk(), pr.memSize, pr.id, pr.prm->Process_start_location, pr.prm->Process_end_location);
                                 finishTime[pr.id-1] = getClk();
                                 break;
                         }
@@ -215,6 +220,7 @@ int main(int argc, char *argv[])
                             pr.prm->Process_start_location = result.Process_start_location;
                             pr.prm->Process_end_location = result.Process_end_location;
                             if(result.Process_start_location != -1){
+                                fprintf(MemoryLog, "at time %d allocated %d bytes for process %d from %d to %d\n", getClk(), pr.memSize, pr.id, result.Process_start_location, result.Process_end_location);
                                 pr.isAllocated = 1;
                                 dequeue(hardDisk);
                                 switch (algorithm) {
@@ -278,6 +284,7 @@ int main(int argc, char *argv[])
                         /*printf("process_start_location %d \n",pr.prm->Process_start_location);
                         printf("process_end_location %d \n",pr.prm->Process_end_location);*/
                         if(result.Process_start_location != -1){
+                            fprintf(MemoryLog, "at time %d allocated %d bytes for process %d from %d to %d\n", getClk(), pr.memSize, pr.id, result.Process_start_location, result.Process_end_location);
                             pr.isAllocated = 1;
                             dequeue(hardDisk);
                             switch (algorithm) {
@@ -319,6 +326,7 @@ int main(int argc, char *argv[])
 
 void terminateScheduler(int finishTime[],int numberofProcesses)
 {
+    fclose(MemoryLog);
     //before destroy clock will out put the result to file to test it
     FILE * testFile = fopen("test","w");
     for(int i = 0;i<numberofProcesses;i++)

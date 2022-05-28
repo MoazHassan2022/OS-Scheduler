@@ -8,7 +8,7 @@ struct priorityQueue Q;
 int *remainingTimeOfTheCurrentProcess;
 int *NOOfProcesses;
 int remSem;
-
+FILE *output;
 
 int HPF(struct priorityQueue Q)
 {
@@ -32,7 +32,7 @@ int HPF(struct priorityQueue Q)
         int total = currentProcess.runningTime;
         int remain = currentProcess.remainingTime;
         int wait = time - arr - (total - remain);
-        FILE *output = fopen("scheduler.log","a");
+        output = fopen("scheduler.log","a");
         if(remain==total)
         {
             fprintf(output,"At time %d process %d started arr %d total %d remain %d wait %d \n",time,currentProcess.id,arr,total,remain,wait);
@@ -219,10 +219,11 @@ int SRTN(struct priorityQueue q){ // returns time spent
         pr = extractMax(&q);
         up(remSem);
         while(1) {
-            down(remSem);
+            //down(remSem);
             *remainingTimeOfTheCurrentProcess = pr.remainingTime;
-            up(remSem);
-            up(remSem);
+            printf("remainingTimeOfTheCurrentProcess in SRTN = %d\n", *remainingTimeOfTheCurrentProcess);
+            //up(remSem);
+            //up(remSem);
             waitTillProcessFinishes(1);
             pr.remainingTime -= 1;
             //------------------------------------------------------------------------

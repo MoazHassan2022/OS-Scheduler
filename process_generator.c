@@ -139,7 +139,7 @@ int main(int argc, char * argv[])
     for(int i = 0 ; i< processesCounter ; i ++) // freeing all the allocated processes
         free(&ptable[i]) ;
     free (ptable) ;*/
-    raise(SIGINT);
+    //raise(SIGINT);
 }
 
 void clearResources(int signum)
