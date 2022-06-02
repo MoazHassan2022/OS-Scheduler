@@ -83,7 +83,7 @@ int main(int argc, char * argv[])
     // 2. Ask the user for the chosen scheduling algorithm and its parameters, if there are any.
     int schdulAlgoNo = 0 ;
     int Q = 0; // Quantum
-    printf("Please enter number correspond for the required algo\n1- HPF\n2- SRTN\n3-RR \n") ;
+    printf("Please enter number that corresponds for the required algorithm\n1- HPF\n2- SRTN\n3- RR \n") ;
     scanf("%d" , &schdulAlgoNo);
 
     // let the user insert the quatum he needs 
@@ -139,23 +139,13 @@ int main(int argc, char * argv[])
             int send = msgsnd(Queue , &p ,sizeof(p), !IPC_NOWAIT && MSG_NOERROR);
             if(send == -1)
                 perror("fail to send\n") ;
-                //exit(-1);
         }
-        //sleep(1);   // sleep the second of the clock
     }
-
-    // 7. Clear clock resources
-    //destroyClk(true);
-    /*free(s3);
-    for(int i = 0 ; i< processesCounter ; i ++) // freeing all the allocated processes
-        free(&ptable[i]) ;
-    free (ptable) ;*/
-    //raise(SIGINT);
 }
 
 void clearResources(int signum)
 {
-    //TODO Clears all resources in case of interruption
+    //Clears all resources in case of interruption
     system("ipcrm --all=msg"); // turn off all message queues 34an da el server nafso fa lw afl khlas
     signal(SIGINT, 0);
     raise(SIGINT) ;

@@ -110,7 +110,6 @@ int runRoundRobin(struct queue * currentQueue, int quantum){
 
     // getting the process which run
     struct processEntry* pr = front(currentQueue);
-    printf("the process id %d has started and the remaining time %d \n",pr->id,pr->remainingTime);
     int processRemainingTime = pr->remainingTime;
     *remainingTimeOfTheCurrentProcess = processRemainingTime;
     int remainingTime;

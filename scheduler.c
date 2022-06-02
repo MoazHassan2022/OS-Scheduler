@@ -60,7 +60,6 @@ int main(int argc, char *argv[])
     // creating connection between it and the process_generator
     key_t key = ftok("keyFile", 'c');
     int Queue = msgget(key, IPC_CREAT | 0666);
-    //printf("Queue id is %d\n", Queue);
 
 
 
@@ -202,9 +201,6 @@ int main(int argc, char *argv[])
                     processTableForEstUtilization[receivedProcesses].runningTime = p.runningTime;
                     processTableForEstUtilization[receivedProcesses].arrivalTime = p.arrivalTime;
                     processTableForEstUtilization[receivedProcesses].id = p.id;
-                    printf("the received running time%d\n",processTableForEstUtilization[receivedProcesses].runningTime);
-
-
                     receivedProcesses++;
                     ptable[i].isAllocated = 0;
                     i=i+1;
@@ -218,7 +214,6 @@ int main(int argc, char *argv[])
                         int prt1 = *remainingTimeOfTheCurrentProcess;
                         // if the new process has remaining time less than that in the CPU we should inform the algorithms that it should break 
                         if (p.remainingTime < prt1 && !isPriorityQueueEmpty(&theQueue) && prt1 != 9999) {
-                            printf("I raised a SIGUSR1 \n");
                             kill(pid, SIGUSR1);
                         }
                     }
@@ -342,8 +337,6 @@ int main(int argc, char *argv[])
                         pr.prm = malloc(sizeof(process_memory));
                         pr.prm->Process_start_location = result.Process_start_location;
                         pr.prm->Process_end_location = result.Process_end_location;
-                        /*printf("process_start_location %d \n",pr.prm->Process_start_location);
-                        printf("process_end_location %d \n",pr.prm->Process_end_location);*/
                         if(result.Process_start_location != -1){
                             pr.isAllocated = 1;
                             dequeue(hardDisk);
@@ -403,10 +396,8 @@ void terminateScheduler(int finishTime[],int numberofProcesses)
     int idleTimeOfProcessor = idleTime(numberofProcesses);
     int sumOfRunningTime = 0;
     for (int i = 0; i < numberofProcesses; ++i) {
-        printf("runningTime = %d\n",processTableForEstUtilization[i].runningTime);
         sumOfRunningTime += processTableForEstUtilization[i].runningTime;
     }
-    printf("real time = %d \nidleTimeOfprocessor %d\n sumofRunningTime = %d\n",realTime,idleTimeOfProcessor,sumOfRunningTime);
     float utilization =(1-( (realTime - idleTimeOfProcessor-sumOfRunningTime)/(float)sumOfRunningTime))*100;
     //the code of utilization
     int *WTAarr;

@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2022
  * 
  */
-#include "Commons.h"
+#include "commons.h"
 
 struct priorityQueue {
     struct processEntry *H;

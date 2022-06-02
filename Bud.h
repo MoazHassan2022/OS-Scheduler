@@ -38,7 +38,6 @@ struct process_memory allocate(int process_size, int id, int clk)
         fprintf(MemoryLog, "At time %d allocated %d bytes for process %d from %d to %d\n", clk, process_size, id, temp.Process_start_location, temp.Process_end_location);
         fclose(MemoryLog);
         dummy++;
-        printf("Meomry full size from %d to %d allocated\n", temp.Process_start_location, temp.Process_end_location);
         return temp;
     }
     else
@@ -49,7 +48,6 @@ struct process_memory allocate(int process_size, int id, int clk)
 
         if (i > size)
         {
-            printf("Sorry, Not enough memory ya moza.\n");
             struct process_memory prm = init_process_memory(-1, -1);
             return prm;
         }
@@ -75,7 +73,6 @@ struct process_memory allocate(int process_size, int id, int clk)
             fprintf(MemoryLog, "At time %d allocated %d bytes for process %d from %d to %d\n", clk, process_size, id, temp.Process_start_location, temp.Process_end_location);
             fclose(MemoryLog);
             dummy++; 
-            printf("Meomry from %d to %d allocated\n", temp.Process_start_location, temp.Process_end_location);
             return temp;
         }
     }
@@ -110,16 +107,12 @@ int merge(int start_of_process, int Process_size)
             {
                 process_memory prm = init_process_memory( start_of_process, start_of_process + 2 * (pow(2, n) - 1));
                 push_back(&arr[n + 1],prm);
-
-
-                printf("merge of blocks starting at %d and %d Done\n", start_of_process, buddyAddress);
                 new_time = start_of_process;
             }
             else
             {
                 process_memory prm = init_process_memory( buddyAddress, buddyAddress + 2 * (pow(2, n)));
                 push_back(&arr[n + 1],prm);
-                printf("merge of blocks starting at %d and %d Done\n", buddyAddress, start_of_process);
                 new_time = buddyAddress;
             }
             delete(&arr[n],i);
@@ -135,7 +128,7 @@ void deallocate(struct process_memory * p, int id, int clk)
     int start_time = p->Process_start_location;
     int s_size = p->Process_end_location - p->Process_start_location + 1;
     if(s_size >= 257)
-	s_size = 256;
+	    s_size = 256;
     // Size of block to be searched 
     int n = near_block(s_size);
     // Add the block in free array 
@@ -144,7 +137,6 @@ void deallocate(struct process_memory * p, int id, int clk)
     FILE *MemoryLog = fopen("memory.log", "a");
     fprintf(MemoryLog, "At time %d deallocated %d bytes for process %d from %d to %d\n", clk, s_size, id, p->Process_start_location, p->Process_end_location);
     fclose(MemoryLog);
-    printf("Memory block from %d to %d deallocated\n", start_time, (int)(start_time + pow(2, n) - 1) );
     while (1) {
         if (s_size >= 256) break;
         start_time = merge(start_time, s_size);
@@ -152,11 +144,3 @@ void deallocate(struct process_memory * p, int id, int clk)
         s_size *= 2;
     }
 }
-
-/*// Driver code 
-int main() 
-{ 
-    Buddy(); 
-    
-    return 0; 
-}*/

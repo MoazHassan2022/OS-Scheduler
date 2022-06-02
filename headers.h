@@ -22,7 +22,7 @@
 #include <signal.h>
 #include <string.h>
 #include <limits.h>
-#include "Bud.h"
+#include "bud.h"
 #include <sys/time.h>
 
 #define SHKEY 300
@@ -90,7 +90,6 @@ void initClk()
     while ((int)shmid == -1)
     {
         // Make sure that the clock exists
-        printf("Wait! The clock not initialized yet!\n");
         sleep(1);
         shmid = shmget(SHKEY, 4, 0444);
     }
