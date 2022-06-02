@@ -110,7 +110,7 @@ OS-Scheduler
  <br>
  # At time x process y state arr w total z remain j wait k
  <br>
- and details about CPU utilization, Avg Weighted Turnaround Time, Avg Waiting Time and standered deviation of Weighted Turnaround Time to scheduler.pref.
+ And details about CPU utilization, Avg Weighted Turnaround Time, Avg Waiting Time and standered deviation of Weighted Turnaround Time to scheduler.pref.
 <br>
  And finally details about memory allocating and deallocating to memory.log that has this details for every process:
  <br>
