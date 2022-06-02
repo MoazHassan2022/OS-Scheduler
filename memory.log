@@ -1,0 +1,7 @@
+#At time x allocated y bytes for Processs z from i to j
+At time 1 allocated 1 bytes for process 1 from 0 to 0
+At time 3 allocated 1 bytes for process 2 from 1 to 1
+At time 3 allocated 1 bytes for process 3 from 2 to 2
+At time 4 deallocated 1 bytes for process 2 from 1 to 1
+At time 8 deallocated 1 bytes for process 1 from 0 to 0
+At time 9 deallocated 1 bytes for process 3 from 2 to 2

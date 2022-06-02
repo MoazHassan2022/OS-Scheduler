@@ -1,0 +1,15 @@
+# At time x process y state arr w total z remain j wait k
+At time 1 process 1 started arr 1 total 4 remain 4 wait 0 
+At time 3 process 1 stopped arrival 1 total 4 remain 2 wait 0 
+At time 3 process 2 started arr 2 total 1 remain 1 wait 1 
+At time 4 process 2 finished arrival 2 total 1 remain 0 wait 1 TA 2 WTA 2.000000
+At time 4 process 3 started arr 2 total 3 remain 3 wait 2 
+At time 5 process 3 stopped arrival 2 total 3 remain 2 wait 2 
+At time 5 process 1 resumed arr 1 total 4 remain 2 wait 2 
+At time 6 process 1 stopped arrival 1 total 4 remain 1 wait 2 
+At time 6 process 3 resumed arr 2 total 3 remain 2 wait 3 
+At time 7 process 3 stopped arrival 2 total 3 remain 1 wait 3 
+At time 7 process 1 resumed arr 1 total 4 remain 1 wait 3 
+At time 8 process 1 finished arrival 1 total 4 remain 0 wait 3 TA 7 WTA 1.750000
+At time 8 process 3 resumed arr 2 total 3 remain 1 wait 4 
+At time 9 process 3 finished arrival 2 total 3 remain 0 wait 4 TA 7 WTA 2.333333
