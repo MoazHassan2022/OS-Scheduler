@@ -72,7 +72,7 @@ OS-Scheduler
 <h3>Description</h3>
 <blockquote>
   <p>
-  This project was implemented for Operating Systems course in Cairo University, Faculty of Engineering, Commputer Engineering Department.
+  This project was implemented in C language for Operating Systems course in Cairo University, Faculty of Engineering, Commputer Engineering Department.
   <br>
   It is a a processes scheduler with limited memory (1024 Byte) that takes inputs from processes.txt file that has these columns for every process: 
   <ol>
